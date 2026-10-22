@@ -32,15 +32,15 @@ while read -r i; do
 done < <(grep -v '^#' job-images.txt | grep .)
 
 echo "Lab services (lab/up.sh starts them):"
-curl -fs -o /dev/null http://127.0.0.1:8929/users/sign_in && ok "GitLab on http://127.0.0.1:8929" \
+curl --max-time 5 -fs -o /dev/null http://127.0.0.1:8929/users/sign_in && ok "GitLab on http://127.0.0.1:8929" \
   || ko "GitLab on http://127.0.0.1:8929" "lab/up.sh"
 token=$(sed -n 's/^GITLAB_TOKEN=//p' .env 2>/dev/null)
-if [ -n "$token" ] && curl -fs -H "PRIVATE-TOKEN: $token" 'http://127.0.0.1:8929/api/v4/runners/all?status=online' \
+if [ -n "$token" ] && curl --max-time 5 -fs -H "PRIVATE-TOKEN: $token" 'http://127.0.0.1:8929/api/v4/runners/all?status=online' \
   | jq -e 'map(select(.description == "lab-docker")) | length == 1' >/dev/null 2>&1; then
   ok "runner lab-docker online"
 else
   ko "runner lab-docker online" "lab/up.sh"
 fi
-curl -fs -o /dev/null http://127.0.0.1:3000/api/ping && ok "Semaphore UI on http://127.0.0.1:3000" \
+curl --max-time 5 -fs -o /dev/null http://127.0.0.1:3000/api/ping && ok "Semaphore UI on http://127.0.0.1:3000" \
   || ko "Semaphore UI on http://127.0.0.1:3000" "lab/up.sh"
 exit "$missing"
