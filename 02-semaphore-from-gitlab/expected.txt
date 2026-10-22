@@ -1,0 +1,8 @@
+Semaphore task: success
+Commit run: site.yml for Semaphore UI
+Cloning Repository http://gitlab/root/ctl-02.git
+No <repo>/collections/requirements.yml file found. Skip galaxy install process.
+No <repo>/requirements.yml file found. Skip galaxy install process.
+No <repo>/roles/requirements.yml file found. Skip galaxy install process.
+msg: ansible-core 2.20.10 ran site.yml for semaphore-container
+semaphore-container : ok=1 changed=0 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0

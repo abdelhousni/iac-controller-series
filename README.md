@@ -7,7 +7,7 @@ a lab that starts on one machine.
 
 | Directory | Entry |
 |---|---|
-| *(none yet)* | Each entry adds its example here when it is published. |
+| [`02-semaphore-from-gitlab/`](02-semaphore-from-gitlab/) | Ansible controllers in 2026: AWX paused, AAP, Semaphore UI, or plain CI |
 
 Looking for a technique rather than an entry? [INDEX.md](INDEX.md) maps
 each problem to the feature that solves it and the file that shows it.
@@ -23,6 +23,12 @@ lab/smoke.sh    # runs a one-job pipeline end to end
 lab/down.sh     # stops the lab; --wipe also deletes its data and lab/.env
 ```
 
+Then each example, once the lab is up:
+
+```sh
+NN-name/run.sh | diff NN-name/expected.txt -
+```
+
 ## Local lab
 
 What the examples need, and how it was tested: Docker Engine on Linux, with
@@ -35,7 +41,7 @@ What the examples need, and how it was tested: Docker Engine on Linux, with
 | curl, jq, openssl | jq 1.7 | `lab/*.sh` | your distribution's packages |
 | GitLab CE | 19.5.1 (`gitlab/gitlab-ce:19.5.1-ce.0`) | every example | `lab/compose.yml`, pulled by `lab/up.sh` |
 | GitLab Runner | 19.5.1 (`gitlab/gitlab-runner:v19.5.1`), Docker executor | every pipeline | `lab/compose.yml`, registered by `lab/up.sh` |
-| Semaphore UI | 2.19.17 (`semaphoreui/semaphore:v2.19.17`), SQLite | the Semaphore examples | `lab/compose.yml` |
+| Semaphore UI | 2.19.17 (`semaphoreui/semaphore:v2.19.17`), SQLite; bundles ansible-core 2.20.10 | 02 | `lab/compose.yml` |
 | Job image | `alpine:3.22` | `lab/smoke.sh` | pulled once by `lab/up.sh` |
 
 - **Nothing is exposed beyond your machine.** GitLab listens on

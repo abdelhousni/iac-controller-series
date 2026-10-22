@@ -24,7 +24,7 @@ jobs:
           done
           exit $status
       - name: Shell scripts pass shellcheck
-        run: shellcheck lab/*.sh
+        run: shellcheck lab/*.sh [0-9][0-9]-*/run.sh
 
   # The whole lab, started from nothing the way a reader would.
   lab:
@@ -40,3 +40,11 @@ jobs:
         run: lab/check.sh
       - name: A pipeline runs end to end
         run: lab/smoke.sh
+      - name: Every example prints what its entry says
+        run: |
+          status=0
+          for dir in [0-9][0-9]-*/; do
+            echo "== ${dir%/}"
+            "${dir}run.sh" | diff "${dir}expected.txt" - || status=1
+          done
+          exit $status

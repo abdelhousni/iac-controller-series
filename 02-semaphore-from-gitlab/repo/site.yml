@@ -1,0 +1,10 @@
+---
+- name: Report where Semaphore UI ran this playbook
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Show the ansible-core version Semaphore used
+      ansible.builtin.debug:
+        msg: >-
+          ansible-core {{ ansible_version.full }} ran site.yml
+          for {{ inventory_hostname }}
