@@ -30,7 +30,7 @@ one. Every path is relative to the repository root.
 
 | To… | Use | Where |
 |---|---|---|
-| Use a gitlab.com CI/CD component on a self-managed GitLab | copy the project to the same path (`components/opentofu`) with its release tag; push with `-o ci.skip` | `04-opentofu-gitlab-state/run.sh` |
+| Use a gitlab.com CI/CD component on a self-managed GitLab | copy the project to the same path (`components/opentofu`) with its release tag; push with `-o ci.skip` | `lab/opentofu-component.sh` |
 | Run fmt, validate, plan and a manual apply with three lines of CI | `include: component: $CI_SERVER_FQDN/components/opentofu/validate-plan-apply@4.9.0` | `04-opentofu-gitlab-state/repo/.gitlab-ci.yml` |
 | Keep OpenTofu state in GitLab | `backend "http" {}`; `gitlab-tofu` fills in the address and the job token | `04-opentofu-gitlab-state/repo/main.tf` |
 | Start a manual job from a script | `POST /projects/:id/jobs/:job_id/play` | `04-opentofu-gitlab-state/run.sh` |
@@ -38,6 +38,16 @@ one. Every path is relative to the repository root.
 | Read GitLab-managed state from outside CI | `TF_HTTP_ADDRESS`, `TF_HTTP_USERNAME`, `TF_HTTP_PASSWORD` (a personal access token), then `tofu init` | `04-opentofu-gitlab-state/run.sh` |
 | Start a run from no state | `DELETE /projects/:id/terraform/state/:name` | `04-opentofu-gitlab-state/run.sh` |
 | Pre-pull every job image once | `lab/job-images.txt`, read by `lab/up.sh` and `lab/check.sh` | `lab/job-images.txt` |
+
+## GitLab as code
+
+| To… | Use | Where |
+|---|---|---|
+| Manage groups, projects, branch protection, CI/CD variables and runners as code | the `gitlabhq/gitlab` provider: `gitlab_group`, `gitlab_project`, `gitlab_branch_protection`, `gitlab_project_variable`, `gitlab_user_runner` | `05-gitlab-as-code/repo/main.tf` |
+| Give the provider its endpoint and token in a pipeline | protected CI/CD variables `GITLAB_BASE_URL` and `GITLAB_TOKEN` (masked); `provider "gitlab" {}` reads them | `05-gitlab-as-code/run.sh` |
+| Pin a provider and its checksums | commit `.terraform.lock.hcl` (`tofu providers lock`) | `05-gitlab-as-code/repo/.terraform.lock.hcl` |
+| Check that the configuration is applied | run the pipeline again; the plan reports `No changes.` | `05-gitlab-as-code/run.sh` |
+| Create a runner without a registration token | `gitlab_user_runner`; its `token` is returned once and kept in the state | `05-gitlab-as-code/repo/main.tf` |
 
 ## Pitfalls
 
@@ -50,3 +60,5 @@ one. Every path is relative to the repository root.
 | A Semaphore task reports `success` but its log lacks the last lines | the status can be stored before the last log lines | poll the task's `output` until the play recap appears | `02-semaphore-from-gitlab/run.sh` |
 | `include: component: gitlab.com/components/opentofu/…` fails on a self-managed GitLab | components can't be included across instances | copy the component project to the same path on your instance | `04-opentofu-gitlab-state/run.sh` |
 | Pushing a copy of the component starts its own pipeline, which builds images | the component's `.gitlab-ci.yml` runs on push | `git push -o ci.skip` | `04-opentofu-gitlab-state/run.sh` |
+| `DELETE /groups/:id?permanently_remove=true` returns 400 | GitLab 19 only schedules top-level groups for deletion; `permanently_remove` is for subgroups | schedule the deletion; the group is renamed `<path>-deletion_scheduled-<id>`, which frees its path | `05-gitlab-as-code/run.sh` |
+| A runner's authentication token sits in the OpenTofu state | `gitlab_user_runner` returns it once, at creation, and the provider stores it | keep the state where only Maintainers read it (GitLab-managed state is encrypted at rest) | `05-gitlab-as-code/expected.txt` |

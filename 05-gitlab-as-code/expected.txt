@@ -1,0 +1,20 @@
+Component: components/opentofu@4.9.0
+First pipeline:
+  validate / fmt: success
+  validate / validate: success
+  build / plan: success
+  deploy / apply: manual
+  will create: gitlab_branch_protection.main
+  will create: gitlab_group.platform
+  will create: gitlab_project.app
+  will create: gitlab_project_variable.deploy_env
+  will create: gitlab_user_runner.app
+Plan: 5 to add, 0 to change, 0 to destroy.
+Apply: success, Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
+GitLab now has:
+  project platform/app, private, default branch main
+  branch main protected: push Maintainers, merge Developers + Maintainers, force push false
+  variable DEPLOY_ENV=lab, protected true
+  runner "app runner", project_type
+  runner token kept in the OpenTofu state: true
+Second pipeline, plan: No changes. Your infrastructure matches the configuration.

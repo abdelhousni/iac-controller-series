@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# OpenTofu in a GitLab pipeline, with the state kept by GitLab: mirrors GitLab's
+# OpenTofu in a GitLab pipeline, with the state kept by GitLab: copies GitLab's
 # OpenTofu CI/CD component into the lab, pushes repo/ to a project, runs the
 # pipeline (fmt, validate, plan, then the manual apply), reads the state GitLab
 # now holds, and reads it again from outside CI. Needs the lab (lab/up.sh) and
@@ -13,25 +13,8 @@ glapi() { curl -fsS -H "PRIVATE-TOKEN: $token" "$@"; }
 component_version=4.9.0
 
 # 1. The component, at components/opentofu, as on gitlab.com. A self-managed
-#    GitLab can't include components from gitlab.com, so they are copied in.
-if ! glapi "$gl/projects/components%2Fopentofu/repository/tags/$component_version" >/dev/null 2>&1; then
-  gid=$(glapi "$gl/groups/components" 2>/dev/null | jq -r .id 2>/dev/null) \
-    || gid=$(glapi -X POST "$gl/groups" --data name=components --data path=components \
-      --data visibility=public | jq -r .id)
-  glapi "$gl/projects/components%2Fopentofu" >/dev/null 2>&1 \
-    || glapi -X POST "$gl/projects" --data name=opentofu --data namespace_id="$gid" \
-      --data visibility=public >/dev/null
-  mkdir -p out
-  [ -d out/opentofu-component ] || git clone -q --single-branch --branch main \
-    https://gitlab.com/components/opentofu.git out/opentofu-component
-  git -C out/opentofu-component fetch -q origin "refs/tags/$component_version:refs/tags/$component_version"
-  # ci.skip: the component's own pipeline builds its images; not needed here.
-  git -C out/opentofu-component -c push.negotiate=false \
-    -c http.extraHeader="Authorization: Basic $(printf 'root:%s' "$token" | base64 -w0)" \
-    push -q -o ci.skip http://127.0.0.1:8929/components/opentofu.git \
-    main "refs/tags/$component_version"
-fi
-echo "Component: components/opentofu@$(glapi "$gl/projects/components%2Fopentofu/repository/tags/$component_version" | jq -r .name)"
+#    GitLab can't include components from gitlab.com, so it is copied in.
+../lab/opentofu-component.sh
 
 # 2. The project, with repo/ as its main branch.
 pid=$(glapi "$gl/projects/root%2Fctl-04" 2>/dev/null | jq -r .id 2>/dev/null) \
