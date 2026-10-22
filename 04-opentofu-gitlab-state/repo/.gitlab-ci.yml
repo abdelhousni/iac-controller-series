@@ -1,0 +1,7 @@
+include:
+  - component: $CI_SERVER_FQDN/components/opentofu/validate-plan-apply@4.9.0
+    inputs:
+      version: 4.9.0
+      opentofu_version: 1.12.6
+
+stages: [validate, build, deploy]

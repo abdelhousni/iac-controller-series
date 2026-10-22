@@ -1,0 +1,13 @@
+Component: components/opentofu@4.9.0
+Before apply:
+  validate / fmt: success
+  validate / validate: success
+  build / plan: success
+  deploy / apply: manual
+Plan: 1 to add, 0 to change, 0 to destroy.
+Apply: success, Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+State default: serial 1, written by job apply, locked: false
+Resources: terraform_data.release
+Output release: {"environment":"lab","version":"1.0.0"}
+tofu output from outside CI:
+{"environment":"lab","version":"1.0.0"}

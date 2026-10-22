@@ -1,0 +1,6 @@
+---
+# Examples clone third-party repositories into their out/ directories
+# (ignored by Git); only this repository's own playbooks are linted.
+exclude_paths:
+  - '*/out/'
+  - out/

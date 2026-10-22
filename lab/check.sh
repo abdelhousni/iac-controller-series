@@ -26,6 +26,11 @@ while read -r i; do
   docker image inspect "$i" >/dev/null 2>&1 && ok "$i" || ko "$i" "docker pull $i"
 done < <(sed -n 's/^ *image: //p' compose.yml)
 
+echo "Job images (lab/up.sh pulls them):"
+while read -r i; do
+  docker image inspect "$i" >/dev/null 2>&1 && ok "$i" || ko "$i" "docker pull $i"
+done < <(grep -v '^#' job-images.txt | grep .)
+
 echo "Lab services (lab/up.sh starts them):"
 curl -fs -o /dev/null http://127.0.0.1:8929/users/sign_in && ok "GitLab on http://127.0.0.1:8929" \
   || ko "GitLab on http://127.0.0.1:8929" "lab/up.sh"
