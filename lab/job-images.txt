@@ -1,0 +1,4 @@
+# Images that pipeline jobs and examples run in. lab/up.sh pulls them once,
+# lab/check.sh checks them; the runner's pull policy is if-not-present.
+alpine:3.22
+registry.gitlab.com/components/opentofu/gitlab-opentofu:4.9.0-opentofu1.12.6-alpine
