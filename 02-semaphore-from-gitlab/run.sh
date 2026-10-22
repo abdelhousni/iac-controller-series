@@ -13,7 +13,7 @@ glapi() { curl -fsS -H "PRIVATE-TOKEN: $(sed -n 's/^GITLAB_TOKEN=//p' "$env")" "
 json() { curl -fsS -H 'Content-Type: application/json' "$@"; }
 
 # 1. The playbook in a private GitLab project, as the commit on main.
-pid=$(glapi "$gl/projects/root%2Fctl-02" 2>/dev/null | jq -r .id) \
+pid=$(glapi "$gl/projects/root%2Fctl-02" 2>/dev/null | jq -r .id 2>/dev/null) \
   || pid=$(glapi -X POST "$gl/projects" --data name=ctl-02 --data visibility=private \
     --data initialize_with_readme=true | jq -r .id)
 actions=$(for f in repo/*; do
@@ -64,6 +64,13 @@ tpl=$(s "$sem/project/$p/templates" -d "$(jq -n --argjson p "$p" --argjson r "$r
 task=$(s "$sem/project/$p/tasks" -d "{\"template_id\":$tpl}" | jq -r .id)
 until status=$(s "$sem/project/$p/tasks/$task" | jq -r .status); \
   case $status in success|error|stopped) true ;; *) false ;; esac; do sleep 2; done
+
+# The task can report its status before its last log lines are stored, so
+# wait (up to 60 s) for the play recap to appear in the log.
+for _ in $(seq 30); do
+  s "$sem/project/$p/tasks/$task/output" | jq -r '.[].output' | grep -q ' ok=' && break
+  sleep 2
+done
 
 echo "Semaphore task: $status"
 echo "Commit run: $(s "$sem/project/$p/tasks/$task" | jq -r .commit_message)"

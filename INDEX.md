@@ -34,3 +34,4 @@ one. Every path is relative to the repository root.
 | `/-/readiness` returns 404 | health endpoints answer only the monitoring allowlist | wait on `/users/sign_in`, or add your network to `gitlab_rails['monitoring_whitelist']` | `lab/up.sh` |
 | Semaphore exits: "Unknown database dialect: bolt" | BoltDB support removed | `SEMAPHORE_DB_DIALECT: sqlite` | `lab/compose.yml` |
 | A controller's ansible-core differs from the one the project was tested with | Semaphore UI's image bundles its own ansible-core (2.20.10 in v2.19.17) | check `ansible_version.full` in a task; pin it with a custom image or an execution environment | `02-semaphore-from-gitlab/expected.txt` |
+| A Semaphore task reports `success` but its log lacks the last lines | the status can be stored before the last log lines | poll the task's `output` until the play recap appears | `02-semaphore-from-gitlab/run.sh` |
