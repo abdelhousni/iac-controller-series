@@ -23,6 +23,11 @@ jobs:
             grep -q "${dir%/}" INDEX.md || { echo "INDEX.md: no row for ${dir%/}"; status=1; }
           done
           exit $status
+      - name: Playbooks pass ansible-lint at the production profile
+        run: |
+          python3 -m venv /tmp/lint
+          /tmp/lint/bin/pip install --quiet ansible-lint==26.10.1
+          /tmp/lint/bin/ansible-lint --profile production
       - name: Shell scripts pass shellcheck
         run: shellcheck lab/*.sh [0-9][0-9]-*/run.sh
 

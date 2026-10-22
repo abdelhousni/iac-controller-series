@@ -13,8 +13,10 @@ its API:
 3. In Semaphore UI, creates a project `ctl-02` (replacing the previous run's)
    with a key store entry holding that token (type `login_password`), a
    repository pointing at `http://gitlab/root/ctl-02.git`, a static inventory
-   (the Semaphore container itself, `ansible_connection=local`), an empty
-   variable group and a template for `site.yml`.
+   (the Semaphore container itself), a variable group holding
+   `ansible_connection: local`, and a template for `site.yml` on branch
+   `main`. A lab shortcut: the Red Hat CoP good practices pin production
+   references to a tag, never to a branch.
 4. Runs the template, waits for the task and prints its status, the commit
    it ran and the lines of its log that matter.
 

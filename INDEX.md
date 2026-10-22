@@ -14,6 +14,7 @@ one. Every path is relative to the repository root.
 | Register a runner the GitLab 16+ way | `POST /api/v4/user/runners`, then `gitlab-runner register --token` | `lab/up.sh` |
 | Let job containers reach GitLab by name | `--docker-network-mode` and `--clone-url` at registration | `lab/up.sh` |
 | Check the lab before running anything | `lab/check.sh` | `lab/check.sh` |
+| Lint every playbook in CI | `ansible-lint --profile production` from the repository root | `.github/workflows/examples.yml` |
 | Run a pipeline end to end from a script | the commits API with an `actions` list, then poll `pipelines?sha=` | `lab/smoke.sh` |
 
 ## Controllers

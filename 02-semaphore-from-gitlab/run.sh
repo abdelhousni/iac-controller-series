@@ -52,8 +52,10 @@ repo=$(s "$sem/project/$p/repositories" -d "$(jq -n --argjson p "$p" --argjson k
   '{project_id:$p, name:"ctl-02", git_url:"http://gitlab/root/ctl-02.git", git_branch:"main", ssh_key_id:$k}')" | jq -r .id)
 inv=$(s "$sem/project/$p/inventory" -d "$(jq -n --argjson p "$p" --argjson k "$none" \
   '{project_id:$p, name:"local", type:"static", ssh_key_id:$k,
-    inventory:"semaphore-container ansible_connection=local"}')" | jq -r .id)
-envid=$(s "$sem/project/$p/environment" -d "{\"project_id\":$p,\"name\":\"empty\",\"json\":\"{}\",\"env\":\"{}\"}" | jq -r .id)
+    inventory:"semaphore-container"}')" | jq -r .id)
+# The connection variable lives in the variable group, not on the host line.
+envid=$(s "$sem/project/$p/environment" -d "$(jq -n --argjson p "$p" \
+  '{project_id:$p, name:"local", json:({ansible_connection:"local"} | tojson), env:"{}"}')" | jq -r .id)
 tpl=$(s "$sem/project/$p/templates" -d "$(jq -n --argjson p "$p" --argjson r "$repo" --argjson i "$inv" --argjson e "$envid" \
   '{project_id:$p, name:"site", app:"ansible", playbook:"site.yml",
     repository_id:$r, inventory_id:$i, environment_id:$e}')" | jq -r .id)
