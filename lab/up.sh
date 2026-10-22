@@ -33,7 +33,10 @@ api() { curl -fsS -H "PRIVATE-TOKEN: $(get GITLAB_TOKEN)" "$@"; }
 # The job image, pulled once here: with the runner's default pull policy
 # (always), every job asks Docker Hub again and soon hits its anonymous rate
 # limit, so the runner below uses if-not-present.
-for i in 1 2 3 4 5; do docker pull -q alpine:3.22 >/dev/null && break; sleep $((i * 20)); done
+for i in 1 2 3 4 5; do
+  docker image inspect alpine:3.22 >/dev/null 2>&1 || docker pull -q alpine:3.22 >/dev/null && break
+  sleep $((i * 20))
+done
 
 # An instance runner: created through the API (GitLab 16 and later), then
 # registered with the authentication token the API returns.

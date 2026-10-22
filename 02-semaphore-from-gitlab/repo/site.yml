@@ -1,0 +1,13 @@
+---
+- name: Report where Semaphore UI ran this playbook
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Show the ansible-core version Semaphore used
+      ansible.builtin.debug:
+        msg: >-
+          ansible-core {{ ansible_version.full }} ran site.yml
+          for {{ inventory_hostname }}
+        # The message is this example's output, so it shows at the default
+        # verbosity; stated explicitly, as the CoP asks of every debug task.
+        verbosity: 0
