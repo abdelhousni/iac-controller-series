@@ -1,0 +1,64 @@
+# Running IaC from a controller, the GitOps way: examples
+
+Runnable examples for the **Running IaC from a controller, the GitOps way**
+series on [til.housni.eu](https://til.housni.eu/): Ansible, then Packer and
+OpenTofu/Terraform, run from GitLab pipelines and from a controller, against
+a lab that starts on one machine.
+
+| Directory | Entry |
+|---|---|
+| *(none yet)* | Each entry adds its example here when it is published. |
+
+Looking for a technique rather than an entry? [INDEX.md](INDEX.md) maps
+each problem to the feature that solves it and the file that shows it.
+
+## Running them
+
+From the repository root:
+
+```sh
+lab/up.sh       # starts GitLab CE, a runner and Semaphore UI; first start takes 5 to 10 minutes
+lab/check.sh    # reports anything missing; changes nothing
+lab/smoke.sh    # runs a one-job pipeline end to end
+lab/down.sh     # stops the lab; --wipe also deletes its data and lab/.env
+```
+
+## Local lab
+
+What the examples need, and how it was tested: Docker Engine on Linux, with
+15 GB of memory and 4 CPUs; the lab itself uses about 4 GB.
+
+| What | Version tested | Needed by | How |
+|---|---|---|---|
+| Docker Engine | 29.9.1 | the lab | Docker Engine or Docker Desktop, with the daemon running and your user allowed to use it |
+| Docker Compose | 5.6.0 | the lab | the `docker-compose-plugin` package, or bundled with Docker Desktop |
+| curl, jq, openssl | jq 1.7 | `lab/*.sh` | your distribution's packages |
+| GitLab CE | 19.5.1 (`gitlab/gitlab-ce:19.5.1-ce.0`) | every example | `lab/compose.yml`, pulled by `lab/up.sh` |
+| GitLab Runner | 19.5.1 (`gitlab/gitlab-runner:v19.5.1`), Docker executor | every pipeline | `lab/compose.yml`, registered by `lab/up.sh` |
+| Semaphore UI | 2.19.17 (`semaphoreui/semaphore:v2.19.17`), SQLite | the Semaphore examples | `lab/compose.yml` |
+| Job image | `alpine:3.22` | `lab/smoke.sh` | pulled once by `lab/up.sh` |
+
+- **Nothing is exposed beyond your machine.** GitLab listens on
+  `http://127.0.0.1:8929` and Semaphore UI on `http://127.0.0.1:3000`.
+  Inside the lab's Docker network, `iac-lab`, GitLab is `http://gitlab`.
+- **Passwords and tokens are generated** by `lab/up.sh` into `lab/.env`
+  (mode 600, ignored by Git): the GitLab `root` password and an API token,
+  and the Semaphore `admin` password. Compose reads that file, so
+  `docker compose -f lab/compose.yml logs gitlab` and the like work as is.
+- **The runner talks to the host's Docker daemon** through
+  `/var/run/docker.sock`, so jobs run as sibling containers. That gives the
+  jobs control of the host's Docker; fine for a lab, not for a shared
+  runner.
+
+Three things to know:
+
+- **Docker Hub's anonymous rate limit.** With its default pull policy,
+  `always`, the runner asks Docker Hub for the job image on every job and
+  soon gets `429 Too Many Requests`. The lab registers the runner with
+  `--docker-pull-policy if-not-present` and pulls the job image once.
+- **`/-/readiness` answers 404 from the host.** GitLab serves its health
+  endpoints only to its monitoring allowlist, which is `127.0.0.1` inside
+  the container; `lab/up.sh` waits for the sign-in page instead.
+- **Semaphore UI 2.19 has no BoltDB.** Older guides set
+  `SEMAPHORE_DB_DIALECT=bolt`; 2.19 accepts `mysql`, `postgres` or
+  `sqlite` and exits with "Unknown database dialect: bolt".
