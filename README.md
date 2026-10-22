@@ -1,9 +1,10 @@
-# Running IaC from a controller, the GitOps way: examples
+# Running IaC and CaC from a controller: examples
 
-Runnable examples for the **Running IaC from a controller, the GitOps way**
-series on [til.housni.eu](https://til.housni.eu/): Ansible, then Packer and
-OpenTofu/Terraform, run from GitLab pipelines and from a controller, against
-a lab that starts on one machine.
+Runnable examples for the **Running IaC and CaC from a controller**
+series on [til.housni.eu](https://til.housni.eu/): OpenTofu/Terraform, Packer
+and Ansible, run from GitLab pipelines and from a controller, against a lab
+that starts on one machine. Configuration as code covers the servers
+(Ansible) and GitLab itself (OpenTofu's GitLab provider).
 
 | Directory | Entry |
 |---|---|

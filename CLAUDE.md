@@ -1,6 +1,6 @@
 # Working in iac-controller-series
 
-Companion examples for the "Running IaC from a controller, the GitOps way"
+Companion examples for the "Running IaC and CaC from a controller"
 series on til.housni.eu (abdelhousni/til). The plan and state of the series
 are in abdelhousni/til-workbench `iac-controller/README.md` (private).
 
