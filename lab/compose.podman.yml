@@ -1,0 +1,8 @@
+# With rootless Podman: the runner starts job containers through Podman's
+# Docker-compatible socket instead of the Docker daemon's.
+services:
+  runner:
+    volumes:
+      - ${XDG_RUNTIME_DIR}/podman/lab.sock:/var/run/docker.sock
+    security_opt:
+      - label=disable
